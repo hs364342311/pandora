@@ -17,13 +17,13 @@ setup(
     name='Pandora-ChatGPT',
     version=__version__,
     python_requires='>=3.7',
-    author='Neo Peng',
-    author_email='pengzhile@gmail.com',
+    author='huangshun',
+    author_email='hs364342311@gmail.com',
     keywords='OpenAI ChatGPT ChatGPT-Plus gpt-3.5-turbo gpt-3.5-turbo-0301',
     description='A command-line interface to ChatGPT',
     long_description=long_description,
     long_description_content_type='text/markdown',
-    url='https://github.com/pengzhile/pandora',
+    url='https://github.com/hs364342311/pandora.git',
     packages=find_packages('src'),
     package_dir={'pandora': 'src/pandora'},
     include_package_data=True,
@@ -39,8 +39,8 @@ setup(
         ]
     },
     project_urls={
-        'Source': 'https://github.com/pengzhile/pandora',
-        'Tracker': 'https://github.com/pengzhile/pandora/issues',
+        'Source': 'https://github.com/hs364342311/pandora',
+        'Tracker': 'https://github.com/hs364342311/pandora/issues',
     },
     classifiers=[
         'Development Status :: 5 - Production/Stable',
