@@ -158,11 +158,28 @@
 * `PANDORA_ACCESS_TOKEN` 指定`Access Token`字符串。
 * `PANDORA_TOKENS_FILE` 指定一个存放多`Access Token`的文件路径。
 * `PANDORA_PROXY` 指定代理，格式：`protocol://user:pass@ip:port`。
-* `PANDORA_SERVER` 以`http`服务方式启动，格式：`ip:port`。
+* `PANDORA_SERVER` 以`http`服务方式启动，格式：`ip:port`。填写0.0.0.0:port ，使用本机的任何IP可访问
 * `PANDORA_API` 使用`gpt-3.5-turbo`API请求，**你可能需要向`OpenAI`支付费用**。
 * `PANDORA_SENTRY` 启用`sentry`框架来发送错误报告供作者查错，敏感信息**不会被发送**。
 * `PANDORA_VERBOSE` 显示调试信息，且出错时打印异常堆栈信息，供查错使用。
+* `USER_CONFIG_DIR` 指定存储AccessToken文件的目录。
 * 使用Docker方式，设置环境变量即可，无视上述`程序参数`。
+```
+containerName=dockerchatgpt #容器名称
+imageRegistry=hschatgpt #镜像服务名
+version=1.0.4 #镜像版本号
+imageName=$imageRegistry:$version #镜像版本
+STRING=`docker container ls -a |grep $containerName|wc -L`
+if [ $STRING -gt 0 ]
+then
+ echo "container $containerName is exists"
+ docker stop $containerName
+ docker container rm $containerName
+else
+ echo "container $containerName is not exists"
+fi
+docker run -d -it --name $containerName -p 6100:6100 --privileged=true -e USER_CONFIG_DIR="/data" -e PANDORA_SERVER="0.0.0.0:6100" -v /data/soft/install-images/pandora_data:/data hschatgpt:1.0.4
+```
 
 ## 关于 Access Token
 
