@@ -188,6 +188,10 @@ docker run -d -it --name $containerName -p 6100:6100 --privileged=true -e USER_C
 * 其中`accessToken`字段的那一长串内容即是`Access Token`。
 * `Access Token`可以复制保存，其有效期目前为`1个月`。
 * 不要泄露你的`Access Token`，使用它可以操纵你的账号。
+登录的AccessToken文件存在位置在：
+``` shell
+cd /Users/huangshun/Library/Application Support/Pandora-ChatGPT/access_token.dat
+```  
 
 ## HTTP服务文档
 

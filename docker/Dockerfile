@@ -1,6 +1,6 @@
-FROM python:3.7-slim
+FROM python:3.7
 
-MAINTAINER "Neo Peng <pengzhile@gmail.com>"
+MAINTAINER "huangshun <hs364342311@126.com>"
 
 VOLUME /data
 WORKDIR /opt/app
