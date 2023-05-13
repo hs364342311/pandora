@@ -145,13 +145,13 @@ def main():
     parser.add_argument(
         '-s',
         '--server',
-        help='Start as a proxy server. Format: ip:port, default: 127.0.0.1:8008',
+        help='Start as a proxy server. Format: ip:port, default: 0.0.0.0:6100',
         required=False,
         type=str,
         default=None,
         action='store',
         nargs='?',
-        const='127.0.0.1:8008',
+        const='0.0.0.0:6100',
     )
     parser.add_argument(
         '--threads',
