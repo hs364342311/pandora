@@ -1,0 +1,1 @@
+"use strict";(self["webpackChunkchatgpt"]=self["webpackChunkchatgpt"]||[]).push([[322],{2322:function(n,t,e){e.r(t),e.d(t,{default:function(){return i}});var r=e(3396);function u(n,t,e,u,a,c){return(0,r.wg)(),(0,r.iD)("div",null," 用户详情 ")}var a={name:"user-info"},c=e(89);const f=(0,c.Z)(a,[["render",u]]);var i=f}}]);

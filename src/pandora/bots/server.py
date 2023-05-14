@@ -4,7 +4,7 @@ import logging
 from datetime import timedelta
 from os.path import join, abspath, dirname
 
-from flask import Flask, jsonify, make_response, request, Response, render_template
+from flask import Flask, jsonify, make_response, request, Response, render_template , redirect, url_for, session
 from flask_cors import CORS
 from waitress import serve
 from werkzeug.exceptions import default_exceptions
@@ -14,7 +14,11 @@ from werkzeug.serving import WSGIRequestHandler
 from .. import __version__
 from ..exts.hooks import hook_logging
 from ..openai.api import API
-
+from Cryptodome.Cipher import AES
+from Cryptodome.Util.Padding import pad, unpad
+import base64
+from urllib.parse import unquote
+from os import getenv
 
 class ChatBot:
     __default_ip = '127.0.0.1'
@@ -36,7 +40,13 @@ class ChatBot:
         app = Flask(__name__, static_url_path='',
                     static_folder=join(resource_path, 'static'),
                     template_folder=join(resource_path, 'templates'))
+        app.config['SECRET_KEY'] = "chatgpt"
         app.wsgi_app = ProxyFix(app.wsgi_app, x_port=1)
+        # 是否开启登录授权
+        is_authlogin = getenv('PANDORA_OPEN_AUTHLOGIN', False)
+        if is_authlogin and is_authlogin=='true':
+            app.before_request(self.__befor_request)
+
         app.after_request(self.__after_request)
 
         CORS(app, resources={r'/api/*': {'supports_credentials': True, 'expose_headers': [
@@ -68,15 +78,59 @@ class ChatBot:
         app.route('/api/accounts/check')(self.check)
         app.route('/_next/data/olf4sv64FWIcQ_zCGl90t/chat.json')(self.chat_info)
 
-        app.route('/')(self.chat)
+        app.route('/')(self.login)
         app.route('/chat')(self.chat)
         app.route('/chat/<conversation_id>')(self.chat)
+        app.route('/login')(self.login)
 
         if not self.debug:
             self.logger.warning('Serving on http://{}:{}'.format(host, port))
 
         WSGIRequestHandler.protocol_version = 'HTTP/1.1'
         serve(app, host=host, port=port, ident=None, threads=threads)
+
+    @staticmethod
+    def __befor_request():
+
+        url = request.path
+        passUrl = ["/login","/"]
+        suffix = url.startswith('/_next') or url.startswith('/static') or url.startswith("/fonts") or url.startswith('/images') or url.endswith(".png")
+        if url in  passUrl or suffix:
+            pass
+        else:
+            if 'user_id' in session:
+                pass
+            else:
+                _authorization = request.cookies.get('Authorization', None)
+                if _authorization and len(_authorization) > 0:
+                    try:
+                        _authorization = unquote(_authorization)
+                        keytest = b'-mall4j-password'
+                        ciphertest = AES.new(keytest, AES.MODE_ECB)
+                        t = base64.b64decode(bytes(_authorization, encoding='utf8'))
+                        msg = unpad(ciphertest.decrypt(t), AES.block_size, 'pkcs7')
+                        result = str(msg, encoding='utf8')
+                        session["user_id"] = result;
+                    except:
+                        ret = {
+                            'code': 'A00005',
+                            'sucess': "false",
+                            'message': '请求非法，请重新登录'
+                        }
+                        return jsonify(ret)
+
+                if not _authorization:
+                    if url.startswith('/api'):
+                        ret = {
+                            'code': 'A00004',
+                            'sucess': "false",
+                            'message': '未登录'
+                        }
+                        return jsonify(ret)
+                    else:
+                        return redirect(url_for('login'))
+
+
 
     @staticmethod
     def __after_request(resp):
@@ -111,9 +165,20 @@ class ChatBot:
     def __get_token_key():
         return request.headers.get('X-Use-Token', request.cookies.get('token-key'))
 
+    def login(self):
+        is_authlogin = getenv('PANDORA_OPEN_AUTHLOGIN', False)
+        if not is_authlogin or is_authlogin != 'true':
+            return redirect(url_for("chat"))
+
+        rendered = render_template('login.html',
+                                   pandora_base=request.url_root.strip('/'),
+                                   pandora_sentry=self.sentry
+                                   )
+        resp = make_response(rendered)
+        return resp
+
     def chat(self, conversation_id=None):
         query = {'chatId': [conversation_id]} if conversation_id else {}
-
         token_key = request.args.get('token')
         rendered = render_template('chat.html',
                                    pandora_base=request.url_root.strip('/'),
@@ -284,3 +349,7 @@ class ChatBot:
         resp.status_code = remote_resp.status_code
 
         return resp
+
+
+
+

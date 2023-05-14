@@ -159,6 +159,7 @@
 * `PANDORA_SENTRY` 启用`sentry`框架来发送错误报告供作者查错，敏感信息**不会被发送**。
 * `PANDORA_VERBOSE` 显示调试信息，且出错时打印异常堆栈信息，供查错使用。
 * `USER_CONFIG_DIR` 指定存储AccessToken文件的目录。
+* `PANDORA_OPEN_AUTHLOGIN` 启用登录认证，true / false  
 * 使用Docker方式，设置环境变量即可，无视上述`程序参数`。
 ```
 containerName=dockerchatgpt #容器名称
